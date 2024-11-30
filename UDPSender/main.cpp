@@ -72,7 +72,7 @@ std::string get_msg()
 {
     static std::string static_info = get_hostname() + SEP() + get_username() + SEP();
     return static_info + get_utc_time() + SEP();
-}   
+}
 
 int send_msg(const std::string& context)
 {
@@ -85,7 +85,7 @@ int send_msg(const std::string& context)
     destination.sin_addr.s_addr = inet_addr(server_hostname.c_str());
     int n_bytes = ::sendto(sock, msg.c_str(), (int)msg.length(), 0, reinterpret_cast<sockaddr*>(&destination), sizeof(destination));
     std::cout << n_bytes << " bytes sent" << std::endl;
-   
+
 #ifdef _WIN32
     ::closesocket(sock);
 #else
@@ -100,12 +100,15 @@ void test_from()
     std::cout << "in from" << std::endl;
 }
 
-int main()
+int main(int argc, char** argv)
 {
-  std::cout << "== Wil send message to: " << server_hostname << ":" << port << " ===" << std::endl;
+    if (argc >= 1)
+        server_hostname = argv[1];
 
-  test_from();
-  test_from();
+    std::cout << "== Wil send message to: " << server_hostname << ":" << port << " ===" << std::endl;
 
-  return 0;
+    test_from();
+    test_from();
+
+    return 0;
 }
