@@ -102,7 +102,7 @@ void test_from()
 
 int main(int argc, char** argv)
 {
-    if (argc >= 1)
+    if (argc >= 2)
         server_hostname = argv[1];
 
     std::cout << "== Wil send message to: " << server_hostname << ":" << port << " ===" << std::endl;
