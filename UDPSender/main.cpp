@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <string>
 #include <inttypes.h>
@@ -14,7 +13,7 @@
 #include <unistd.h> // close
 #endif
 
-void initLibSockets()
+int initLibSockets()
 {
 #ifdef _WIN32
     // Initialise Winsock DLL
@@ -25,23 +24,17 @@ void initLibSockets()
         fprintf(stderr, "WSAStartup failed.\n");
         exit(1);
     }
+    atexit([]() { WSACleanup(); });
+    return 1;
 #endif
 }
 
-void closeLibSockets()
-{
-#ifdef _WIN32
-    // Clean up sockets library
-    WSACleanup();
-#endif
-}
+static std::string hostname{ "192.168.0.143" };
+static uint16_t port = 9000;
 
 void send_msg(const std::string& msg)
 {
-   static std::string hostname{ "192.168.0.143" };
-   static uint16_t port = 9000;
-   
- // Set up connection and send    
+    static int initLib = initLibSockets();
     auto sock = ::socket(AF_INET, SOCK_DGRAM, 0);
     sockaddr_in destination;
     destination.sin_family = AF_INET;
@@ -58,12 +51,10 @@ void send_msg(const std::string& msg)
 
 int main()
 {
-  initLibSockets();
+  std::cout << "== Wil send message to :" << hostname << ":" << port << " ===" << std::endl;
 
   std::string msg = "Jane Doe";
   send_msg(msg);
-    
-  closeLibSockets();
     
   return 0;
 }

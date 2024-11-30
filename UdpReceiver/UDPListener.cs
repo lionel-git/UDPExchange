@@ -8,18 +8,18 @@ namespace UdpReceiver
 {
     public class UDPListener
     {
-        private int listenPort;
+        private int listenPort_;
 
         public UDPListener(int port)
         {
-            listenPort = port;
+            listenPort_ = port;
         }
 
         public void Start()
         {
-            Console.WriteLine("Starting UDP listener on port " + listenPort);
-            UdpClient listener = new UdpClient(listenPort);
-            IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, listenPort);
+            Console.WriteLine("Starting UDP listener on port " + listenPort_);
+            UdpClient listener = new UdpClient(listenPort_);
+            IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, listenPort_);
             try
             {
                 while (true)
