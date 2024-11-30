@@ -2,6 +2,8 @@
 using System.Net.Sockets;
 using System.Text;
 
+// Todo: Add name resolver on ip address
+
 namespace UdpReceiver
 {
     public class UDPListener
@@ -25,7 +27,9 @@ namespace UdpReceiver
                     Console.WriteLine("Waiting for broadcast");
                     byte[] bytes = listener.Receive(ref groupEP);
 
-                    Console.WriteLine($"Received broadcast from {groupEP} :");
+                    var hostname = DNSResolver.Resolve(groupEP.Address.ToString());
+
+                    Console.WriteLine($"Received broadcast from {groupEP} ({hostname}):");
                     Console.WriteLine($" {Encoding.ASCII.GetString(bytes, 0, bytes.Length)}");
                 }
             }
