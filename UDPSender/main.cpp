@@ -25,8 +25,8 @@ int initLibSockets()
         exit(1);
     }
     atexit([]() { WSACleanup(); });
-    return 1;
 #endif
+    return 1;
 }
 
 static std::string hostname{ "192.168.0.143" };
