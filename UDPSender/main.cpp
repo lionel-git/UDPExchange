@@ -2,6 +2,9 @@
 #include <string>
 #include <inttypes.h>
 
+#include <chrono>
+
+
 #ifdef _WIN32
 #define  _WINSOCK_DEPRECATED_NO_WARNINGS 1
 #include <winsock2.h>
@@ -12,6 +15,8 @@
 #include <sys/socket.h> // socket, sendto
 #include <unistd.h> // close
 #endif
+
+constexpr std::string SEP() { return ","; }
 
 int initLibSockets()
 {
@@ -29,32 +34,78 @@ int initLibSockets()
     return 1;
 }
 
-static std::string hostname{ "192.168.0.143" };
+static std::string server_hostname{ "192.168.0.143" };
 static uint16_t port = 9000;
 
-void send_msg(const std::string& msg)
+std::string get_hostname()
+{
+    char buffer[256]{};
+    if (gethostname(buffer, sizeof(buffer)) == 0)
+        return buffer;
+    return "N/A";
+}
+
+std::string get_username()
+{
+    char buffer[256]{};
+#ifdef _WIN32
+    DWORD len = 256;
+    if (GetUserNameA(buffer, &len))
+        return buffer;
+#else
+    if (getlogin_r(buffer, sizeof(buffer)) == 0)
+        return buffer;
+#endif
+    return "N/A";
+}
+
+std::string get_utc_time()
+{
+    const auto now = std::chrono::system_clock::now();
+    //auto zt_local = std::chrono::zoned_time{ std::chrono::current_zone(), now };
+    std::ostringstream oss;
+    oss << now; // zt_local;
+    return oss.str();
+}
+
+std::string get_msg()
+{
+    static std::string static_info = get_hostname() + SEP() + get_username() + SEP();
+    return static_info + get_utc_time() + SEP();
+}   
+
+int send_msg(const std::string& context)
 {
     static int initLib = initLibSockets();
+    std::string msg = get_msg() + context;
     auto sock = ::socket(AF_INET, SOCK_DGRAM, 0);
     sockaddr_in destination;
     destination.sin_family = AF_INET;
     destination.sin_port = htons(port);
-    destination.sin_addr.s_addr = inet_addr(hostname.c_str());
+    destination.sin_addr.s_addr = inet_addr(server_hostname.c_str());
     int n_bytes = ::sendto(sock, msg.c_str(), (int)msg.length(), 0, reinterpret_cast<sockaddr*>(&destination), sizeof(destination));
     std::cout << n_bytes << " bytes sent" << std::endl;
+   
 #ifdef _WIN32
     ::closesocket(sock);
 #else
     ::close(sock);
 #endif
+    return n_bytes;
+}
+
+void test_from()
+{
+    static int canary = send_msg(__FUNCTION__);
+    std::cout << "in from" << std::endl;
 }
 
 int main()
 {
-  std::cout << "== Wil send message to :" << hostname << ":" << port << " ===" << std::endl;
+  std::cout << "== Wil send message to: " << server_hostname << ":" << port << " ===" << std::endl;
 
-  std::string msg = "Jane Doe";
-  send_msg(msg);
-    
+  test_from();
+  test_from();
+
   return 0;
 }

@@ -30,7 +30,7 @@ namespace UdpReceiver
                     var hostname = DNSResolver.Resolve(groupEP.Address.ToString());
 
                     Console.WriteLine($"Received broadcast from {groupEP} ({hostname}):");
-                    Console.WriteLine($" {Encoding.ASCII.GetString(bytes, 0, bytes.Length)}");
+                    Console.WriteLine($" >'{Encoding.ASCII.GetString(bytes, 0, bytes.Length)}'");
                 }
             }
             catch (SocketException e)
