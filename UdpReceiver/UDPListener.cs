@@ -9,29 +9,35 @@ namespace UdpReceiver
     public class UDPListener
     {
         private int listenPort_;
+        private string path_;
+        private StreamWriter outputFile_;
 
-        public UDPListener(int port)
+        public UDPListener(int port, string path)
         {
             listenPort_ = port;
+            outputFile_ = new StreamWriter(path);
+            path_ = path;
         }
 
         public void Start()
         {
-            Console.WriteLine("Starting UDP listener on port " + listenPort_);
+            Console.WriteLine($"Starting UDP listener on port {listenPort_} write to file: {path_}");
+            var now0 = DateTime.Now.ToUniversalTime();
+            outputFile_.WriteLine($"{now0.ToString("yyyy-MM-dd hh:mm:ss.fffffff")} =============================================================");
             UdpClient listener = new UdpClient(listenPort_);
             IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, listenPort_);
             try
             {
+                Console.WriteLine("Waiting for message...");
                 while (true)
                 {
-                    Console.WriteLine("Waiting for broadcast");
                     byte[] bytes = listener.Receive(ref groupEP);
-
                     var hostname = DNSResolver.Resolve(groupEP.Address.ToString());
-
-                    Console.WriteLine($"Received broadcast from {groupEP} ({hostname}):");
-                    Console.WriteLine($" >'{Encoding.ASCII.GetString(bytes, 0, bytes.Length)}'");
+                    var now = DateTime.Now.ToUniversalTime();
+                    outputFile_.WriteLine($"{now.ToString("yyyy-MM-dd hh:mm:ss.fffffff")},{hostname},{Encoding.ASCII.GetString(bytes, 0, bytes.Length)}");
+                    outputFile_.Flush();
                 }
+
             }
             catch (SocketException e)
             {
@@ -39,6 +45,8 @@ namespace UdpReceiver
             }
             finally
             {
+                Console.WriteLine("Closing");
+                outputFile_.Close();
                 listener.Close();
             }
         }

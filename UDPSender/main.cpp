@@ -84,6 +84,7 @@ int send_msg(const std::string& context)
     destination.sin_port = htons(port);
     destination.sin_addr.s_addr = inet_addr(server_hostname.c_str());
     int n_bytes = ::sendto(sock, msg.c_str(), (int)msg.length(), 0, reinterpret_cast<sockaddr*>(&destination), sizeof(destination));
+    std::cout << "Message: " << msg << std::endl;
     std::cout << n_bytes << " bytes sent" << std::endl;
 
 #ifdef _WIN32
@@ -94,10 +95,28 @@ int send_msg(const std::string& context)
     return n_bytes;
 }
 
-void test_from()
+void test_from1()
 {
     static int canary = send_msg(__FUNCTION__);
-    std::cout << "in from" << std::endl;
+   // std::cout << "in " << __FUNCTION__ << std::endl;
+}
+
+void test_from2()
+{
+    static int canary = send_msg(__FUNCTION__);
+   // std::cout << "in " << __FUNCTION__ << std::endl;
+}
+
+void test_from3()
+{
+    static int canary = send_msg(__FUNCTION__);
+    //std::cout << "in " << __FUNCTION__ << std::endl;
+}
+
+void test_from4()
+{
+    static int canary = send_msg(__FUNCTION__);
+    //std::cout << "in " << __FUNCTION__ << std::endl;
 }
 
 int main(int argc, char** argv)
@@ -107,8 +126,13 @@ int main(int argc, char** argv)
 
     std::cout << "== Wil send message to: " << server_hostname << ":" << port << " ===" << std::endl;
 
-    test_from();
-    test_from();
+    for (int i = 0; i < 10; ++i)
+    {
+        test_from1();
+        test_from2();
+        test_from3();
+        test_from4();
+    }
 
     return 0;
 }

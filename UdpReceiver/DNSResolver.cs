@@ -20,6 +20,7 @@ namespace UdpReceiver
             }
             catch (Exception e)
             {
+                Console.WriteLine($"Unable to resolve ip: '{ip}'");
                 Console.WriteLine(e);
                 return ip;
             }

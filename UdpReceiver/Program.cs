@@ -4,7 +4,8 @@
     {
         static void Main(string[] args)
         {
-            var listener = new UDPListener(9000);
+            string outputFilePath = "output.log";
+            var listener = new UDPListener(9000, outputFilePath);
             listener.Start();
             Console.WriteLine("Press key to stop...");
             Console.ReadKey();
