@@ -22,6 +22,7 @@ namespace UdpReceiver
             {
                 Console.WriteLine($"Unable to resolve ip: '{ip}'");
                 Console.WriteLine(e);
+                dnsCache_[ip] = ip;
                 return ip;
             }
         }
