@@ -12,10 +12,10 @@ namespace UdpReceiver
         private string path_;
         private StreamWriter outputFile_;
 
-        public UDPListener(int port, string path)
+        public UDPListener(int port, string path, bool appendLog)
         {
             listenPort_ = port;
-            outputFile_ = new StreamWriter(path);
+            outputFile_ = new StreamWriter(path, appendLog);
             path_ = path;
         }
 
@@ -24,6 +24,7 @@ namespace UdpReceiver
             Console.WriteLine($"Starting UDP listener on port {listenPort_} write to file: {path_}");
             var now0 = DateTime.Now.ToUniversalTime();
             outputFile_.WriteLine($"{now0.ToString("yyyy-MM-dd hh:mm:ss.fffffff")} =============================================================");
+            outputFile_.Flush();
             UdpClient listener = new UdpClient(listenPort_);
             IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, listenPort_);
             try
